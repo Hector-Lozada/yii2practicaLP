@@ -28,7 +28,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'tipo') ?>
 
+    <?php // echo $form->field($model, 'rol') ?>
+
     <?php // echo $form->field($model, 'email') ?>
+
+    <?php // echo $form->field($model, 'password_hash') ?>
 
     <?php // echo $form->field($model, 'telefono') ?>
 

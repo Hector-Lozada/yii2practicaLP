@@ -14,109 +14,104 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('app', 'Usuarios');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="usuarios-index">
+<div class="usuarios-index card shadow p-4 mt-3">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a(Yii::t('app', 'Crear Usuario'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0"><?= Html::encode($this->title) ?></h2>
+        <?= Html::a('<i class="bi bi-plus-circle"></i> ' . Yii::t('app', 'Nuevo Usuario'), ['create'], ['class' => 'btn btn-success btn-lg']) ?>
+    </div>
 
     <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'tableOptions' => ['class' => 'table table-bordered table-hover align-middle'],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
             [
                 'attribute' => 'foto_perfil_path',
+                'label' => 'Foto',
                 'format' => 'html',
                 'value' => function($model) {
-                    $imageUrl = $model->foto_perfil_path 
-                        ? Url::to('@web/uploads/users/' . $model->foto_perfil_path) 
-                        : Url::to('@web/images/default-user.png');
-                    return Html::img($imageUrl, [
-                        'style' => 'width: 50px; height: 50px; object-fit: cover; border-radius: 50%;',
-                        'alt' => 'Foto de perfil',
-                        'class' => 'img-thumbnail'
-                    ]);
+                    if ($model->foto_perfil_path && file_exists(Yii::getAlias('@webroot/' . $model->foto_perfil_path))) {
+                        return Html::img(
+                            Yii::getAlias('@web/' . $model->foto_perfil_path),
+                            [
+                                'class' => 'rounded-circle shadow',
+                                'style' => 'width:50px; height:50px; object-fit:cover; border:2px solid #00723A; background:#fff;',
+                                'alt' => $model->nombre,
+                            ]
+                        );
+                    } else {
+                        return Html::tag('span', '<i class="bi bi-person-circle" style="font-size:2.5rem;color:#ccc"></i>', ['class'=>'d-inline-block']);
+                    }
                 },
-                'contentOptions' => ['style' => 'width: 70px;'],
+                'contentOptions' => ['style' => 'text-align:center;'],
+                'headerOptions' => ['style' => 'width:70px; text-align:center;'],
+                'filter' => false
             ],
-            'usuario_id',
             'codigo_universitario',
             'nombre',
             'apellido',
             [
                 'attribute' => 'tipo',
-                'value' => function($model) {
-                    return $model->displayTipo();
-                },
                 'filter' => Usuarios::optsTipo(),
+                'value' => function($model) { return $model->displayTipo(); },
+            ],
+            [
+                'attribute' => 'rol',
+                'filter' => Usuarios::optsRol(),
+                'value' => function($model) { return $model->displayRol(); },
             ],
             'email:email',
+            // 'password_hash', // No se recomienda mostrar hashes de contraseñas en el listado
             'telefono',
             [
                 'attribute' => 'activo',
-                'value' => function($model) {
-                    return $model->activo ? 'Sí' : 'No';
-                },
+                'format' => 'html',
                 'filter' => [1 => 'Sí', 0 => 'No'],
+                'value' => function ($model) {
+                    return $model->activo ? 
+                        '<span class="badge bg-success">Activo</span>' : 
+                        '<span class="badge bg-danger">Inactivo</span>';
+                }
             ],
             [
                 'attribute' => 'fecha_registro',
-                'format' => ['date', 'php:d/m/Y'],
-                'filter' => false,
+                'label' => 'Fecha registro',
+                'value' => function($model) {
+                    return $model->fecha_registro ? Yii::$app->formatter->asDate($model->fecha_registro) : '';
+                },
+                'filter' => false
             ],
             [
                 'attribute' => 'fecha_actualizacion',
-                'format' => ['date', 'php:d/m/Y'],
-                'filter' => false,
+                'label' => 'Fecha actualización',
+                'value' => function($model) {
+                    return $model->fecha_actualizacion ? Yii::$app->formatter->asDate($model->fecha_actualizacion) : '';
+                },
+                'filter' => false
             ],
             [
                 'class' => ActionColumn::className(),
-                'header' => 'Acciones',
-                'template' => '{view} {update} {delete}',
-                'buttons' => [
-                    'view' => function ($url, $model) {
-                        return Html::a('<i class="fas fa-eye"></i>', $url, [
-                            'title' => 'Ver',
-                            'class' => 'btn btn-sm btn-primary',
-                        ]);
-                    },
-                    'update' => function ($url, $model) {
-                        return Html::a('<i class="fas fa-pencil-alt"></i>', $url, [
-                            'title' => 'Editar',
-                            'class' => 'btn btn-sm btn-success',
-                        ]);
-                    },
-                    'delete' => function ($url, $model) {
-                        return Html::a('<i class="fas fa-trash"></i>', $url, [
-                            'title' => 'Eliminar',
-                            'class' => 'btn btn-sm btn-danger',
-                            'data' => [
-                                'confirm' => '¿Estás seguro de eliminar este usuario?',
-                                'method' => 'post',
-                            ],
-                        ]);
-                    },
-                ],
                 'urlCreator' => function ($action, Usuarios $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'usuario_id' => $model->usuario_id]);
                 }
             ],
         ],
-        'tableOptions' => ['class' => 'table table-striped table-bordered'],
+        'summary' => 'Mostrando <b>{begin}-{end}</b> de <b>{totalCount}</b> usuarios',
         'pager' => [
-            'options' => ['class' => 'pagination justify-content-center'],
-            'linkOptions' => ['class' => 'page-link'],
-            'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
+            'class' => \yii\bootstrap5\LinkPager::class,
         ],
     ]); ?>
 
     <?php Pjax::end(); ?>
-
 </div>
+
+<style>
+.usuarios-index .table th, .usuarios-index .table td {
+    vertical-align: middle;
+}
+</style>

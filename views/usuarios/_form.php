@@ -2,147 +2,128 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\helpers\Url;
+use yii\web\UploadedFile;
 
 /** @var yii\web\View $this */
 /** @var app\models\Usuarios $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="usuarios-form">
+<div class="usuarios-form card shadow p-4 mt-3">
 
     <?php $form = ActiveForm::begin([
-        'options' => ['enctype' => 'multipart/form-data'] // Necesario para subir archivos
+        'options' => ['enctype' => 'multipart/form-data'] // Para subida de archivos
     ]); ?>
 
     <div class="row">
-        <div class="col-md-8">
-            <?= $form->field($model, 'codigo_universitario')->textInput([
-    'maxlength' => true,
-    'placeholder' => 'Ej: 2023001',
-    'required' => true
-]) ?>
+        <div class="col-md-6">
+            <?= $form->field($model, 'codigo_universitario', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese el código universitario',
+                    'required' => true
+                ]
+            ])->label('Código Universitario <span style="color:red">*</span>') ?>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <?= $form->field($model, 'nombre')->textInput([
-    'maxlength' => true,
-    'placeholder' => 'Nombre(s)',
-    'required' => true
-]) ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model, 'apellido')->textInput([
-    'maxlength' => true,
-    'placeholder' => 'Apellido(s)',
-    'required' => true
-]) ?>
-                </div>
-            </div>
+            <?= $form->field($model, 'nombre', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese el nombre',
+                    'required' => true
+                ]
+            ])->label('Nombre <span style="color:red">*</span>') ?>
+
+            <?= $form->field($model, 'apellido', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese el apellido',
+                    'required' => true
+                ]
+            ])->label('Apellido <span style="color:red">*</span>') ?>
 
             <?= $form->field($model, 'tipo')->dropDownList([
-                'estudiante' => 'Estudiante', 
-                'profesor' => 'Profesor', 
-                'administrativo' => 'Administrativo', 
-                'visitante' => 'Visitante'
+                'estudiante' => 'Estudiante',
+                'profesor' => 'Profesor',
+                'administrativo' => 'Administrativo',
+                'visitante' => 'Visitante',
             ], [
                 'prompt' => 'Seleccione un tipo',
-                'class' => 'form-select',
-                'required' => true
-            ]) ?>
+                'required' => true,
+                'class' => 'form-select'
+            ])->label('Tipo <span style="color:red">*</span>') ?>
 
-            <?= $form->field($model, 'email')->textInput([
-                'maxlength' => true,
-                'type' => 'email',
-                'placeholder' => 'ejemplo@universidad.edu',
-                'required' => true
-            ]) ?>
+            <?= $form->field($model, 'rol')->dropDownList([
+                'admin' => 'Administrador',
+                'usuario' => 'Usuario',
+            ], [
+                'prompt' => 'Seleccione un rol',
+                'required' => true,
+                'class' => 'form-select'
+            ])->label('Rol <span style="color:red">*</span>') ?>
 
-            <?= $form->field($model, 'telefono')->textInput([
-                'maxlength' => true,
-                'placeholder' => 'Formato: 555-1234567',
-                'required' => true
-            ]) ?>
+            <?= $form->field($model, 'email', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese el correo electrónico',
+                    'type' => 'email',
+                    'required' => true
+                ]
+            ])->label('Correo electrónico <span style="color:red">*</span>') ?>
 
-            <?= $form->field($model, 'activo')->checkbox([
-                'label' => 'Usuario activo',
-                'uncheck' => 0,
-                'checked' => ($model->isNewRecord) ? true : $model->activo,
-                'required' => true
-            ]) ?>
+            <?= $form->field($model, 'password_hash', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese la contraseña',
+                    'type' => 'password',
+                    'required' => true
+                ]
+            ])->label('Contraseña <span style="color:red">*</span>') ?>
         </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'telefono', [
+                'inputOptions' => [
+                    'class' => 'form-control',
+                    'maxlength' => true,
+                    'placeholder' => 'Ingrese el teléfono',
+                    'required' => true
+                ]
+            ])->label('Teléfono <span style="color:red">*</span>') ?>
 
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-body text-center">
-                    <!-- Vista previa de la imagen -->
-                    <?php $imageUrl = !empty($model->foto_perfil_path) ? 
-                        Url::base(true).'/'.$model->foto_perfil_path : 
-                        Url::base(true).'/images/default-profile.jpg'; ?>
-                    
-                    <img id="imagePreview" src="<?= $imageUrl ?>" 
-                         class="img-thumbnail mb-3" 
-                         style="max-width: 200px; max-height: 200px;">
-                    
-                    <!-- Campo real para subir archivos -->
-                    <?= $form->field($model, 'imageFile', [
-                        'template' => '
-                            <div class="custom-file">
-                                {input}
-                                {label}
-                                {error}
-                            </div>
-                        ',
-                        'labelOptions' => ['class' => 'custom-file-label'],
-                        'inputOptions' => ['class' => 'custom-file-input']
-                    ])->fileInput([
-    'accept' => 'image/*',
-    'id' => 'imageUpload',
-    'required' => true
-                    ])->label('Seleccionar imagen', [
-                        'class' => 'btn btn-primary'
-                    ]) ?>
-                    
-                    <!-- Campo oculto para mantener la ruta existente -->
-                    <?= $form->field($model, 'foto_perfil_path')->hiddenInput()->label(false) ?>
+            <?= $form->field($model, 'activo')->dropDownList([
+                1 => 'Activo',
+                0 => 'Inactivo'
+            ], [
+                'prompt' => 'Seleccione el estado',
+                'required' => true,
+                'class' => 'form-select'
+            ])->label('Estado <span style="color:red">*</span>') ?>
+
+            
+
+            <?php if ($model->foto_perfil_path): ?>
+                <div class="mb-2">
+                    <label>Imagen actual:</label><br>
+                    <img src="<?= Yii::getAlias('@web/' . $model->foto_perfil_path) ?>" class="rounded-circle shadow" style="width: 80px; height: 80px; object-fit:cover;">
                 </div>
-            </div>
+            <?php endif; ?>
+
+           <?= $form->field($model, 'foto_perfil')->fileInput([
+    'accept' => 'image/*',
+    'class' => 'form-control',
+    'required' => $model->isNewRecord // obligatorio solo al crear
+])->label('Foto de perfil <span style="color:red">*</span>') ?>
         </div>
     </div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Guardar'), [
-            'class' => 'btn btn-success btn-lg',
-            'style' => 'width: 100%;'
-        ]) ?>
+    <div class="form-group mt-4 text-center">
+        <?= Html::submitButton(Yii::t('app', 'Guardar'), ['class' => 'btn btn-success btn-lg px-5']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
 
 </div>
-
-<?php
-// JavaScript para vista previa de imagen
-$this->registerJs(<<<JS
-$(document).ready(function() {
-    // Vista previa de la imagen antes de subir
-    $('#imageUpload').change(function(e) {
-        var file = e.target.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#imagePreview').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // Cambiar estilo del campo de archivo
-    $('.custom-file-input').on('change', function() {
-        var fileName = $(this).val().split('\\\\').pop();
-        $(this).next('.custom-file-label').html(fileName);
-    });
-});
-JS
-);
-?>

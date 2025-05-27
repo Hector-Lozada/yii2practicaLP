@@ -10,34 +10,26 @@ use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use Yii;
 
-/**
- * UsuariosController implements the CRUD actions for Usuarios model.
- */
 class UsuariosController extends Controller
 {
-    /**
-     * @inheritDoc
-     */
     public function behaviors()
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
+{
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                    'matchCallback' => function ($rule, $action) {
+                        return !Yii::$app->user->isGuest && Yii::$app->user->identity->isAdmin();
+                    }
                 ],
-            ]
-        );
-    }
+            ],
+        ],
+    ];
+}
 
-    /**
-     * Lists all Usuarios models.
-     *
-     * @return string
-     */
     public function actionIndex()
     {
         $searchModel = new UsuariosSearch();
@@ -49,12 +41,6 @@ class UsuariosController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Usuarios model.
-     * @param int $usuario_id Usuario ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionView($usuario_id)
     {
         return $this->render('view', [
@@ -62,62 +48,47 @@ class UsuariosController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Usuarios model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
     public function actionCreate()
-{
-    $model = new Usuarios();
+    {
+        $model = new Usuarios();
 
-    if ($this->request->isPost) {
-        $model->load($this->request->post());
-        $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+        if ($this->request->isPost) {
+            $model->load($this->request->post());
+            $model->foto_perfil = UploadedFile::getInstance($model, 'foto_perfil');
 
-        // Validación separada para el archivo
-        $fileValid = true;
-        if ($model->imageFile) {
-            $fileValid = $model->validate(['imageFile']);
-        }
-
-        if ($fileValid && $model->upload() && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Usuario creado correctamente.');
-            return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
+            // Validar archivo si se subió, si no, igual validar el resto
+            if ($model->validate()) {
+                if ($model->uploadFotoPerfil() && $model->save(false)) {
+                    Yii::$app->session->setFlash('success', 'Usuario registrado correctamente.');
+                    return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Error al registrar el Usuario.');
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Error al validar los datos.');
+            }
         } else {
-            Yii::$app->session->setFlash('error', 'Error al crear el usuario.');
+            $model->loadDefaultValues();
         }
-    } else {
-        $model->loadDefaultValues();
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
-    return $this->render('create', [
-        'model' => $model,
-    ]);
-}
-
-    /**
-     * Updates an existing Usuarios model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $usuario_id Usuario ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate($usuario_id)
     {
         $model = $this->findModel($usuario_id);
-        $imagenAnterior = $model->foto_perfil_path; // Guardar la ruta de la imagen anterior
+        $imagenAnterior = $model->foto_perfil_path;
 
         if ($this->request->isPost && $model->load($this->request->post())) {
-            // Manejar la subida de la imagen
-            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
-            
-            // Si se subió una nueva imagen o no
-            if ($model->imageFile) {
-                if ($model->upload() && $model->save()) {
-                    // Eliminar la imagen anterior si existe y se subió una nueva
-                    if ($imagenAnterior && file_exists($model->getUploadPath() . $imagenAnterior)) {
-                        unlink($model->getUploadPath() . $imagenAnterior);
+            $model->foto_perfil = UploadedFile::getInstance($model, 'foto_perfil');
+
+            if ($model->foto_perfil) {
+                if ($model->uploadFotoPerfil() && $model->save(false)) {
+                    // Eliminar imagen anterior si existe y es distinta
+                    if ($imagenAnterior && $imagenAnterior !== $model->foto_perfil_path && file_exists(Yii::getAlias('@webroot/' . $imagenAnterior))) {
+                        @unlink(Yii::getAlias('@webroot/' . $imagenAnterior));
                     }
                     Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
                     return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
@@ -125,13 +96,13 @@ class UsuariosController extends Controller
             } else {
                 // Si no se subió nueva imagen, mantener la anterior
                 $model->foto_perfil_path = $imagenAnterior;
-                if ($model->save()) {
+                if ($model->save(false)) {
                     Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
                     return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
                 }
             }
-            
-            Yii::$app->session->setFlash('error', 'Error al actualizar el usuario.');
+
+            Yii::$app->session->setFlash('error', 'Error al actualizar el Usuario.');
         }
 
         return $this->render('update', [
@@ -139,38 +110,18 @@ class UsuariosController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Usuarios model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $usuario_id Usuario ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($usuario_id)
     {
         $model = $this->findModel($usuario_id);
-        
-        // Eliminar la imagen asociada si existe
-        if ($model->foto_perfil_path && file_exists($model->getUploadPath() . $model->foto_perfil_path)) {
-            unlink($model->getUploadPath() . $model->foto_perfil_path);
+        // Borra la imagen si existe
+        if ($model->foto_perfil_path && file_exists(Yii::getAlias('@webroot/' . $model->foto_perfil_path))) {
+            @unlink(Yii::getAlias('@webroot/' . $model->foto_perfil_path));
         }
-        
-        if ($model->delete()) {
-            Yii::$app->session->setFlash('success', 'Usuario eliminado correctamente.');
-        } else {
-            Yii::$app->session->setFlash('error', 'Error al eliminar el usuario.');
-        }
+        $model->delete();
 
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Usuarios model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $usuario_id Usuario ID
-     * @return Usuarios the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($usuario_id)
     {
         if (($model = Usuarios::findOne(['usuario_id' => $usuario_id])) !== null) {

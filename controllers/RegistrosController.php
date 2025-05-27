@@ -19,19 +19,30 @@ class RegistrosController extends Controller
      * @inheritDoc
      */
     public function behaviors()
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
+{
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::class,
+            'rules' => [
+                // Acciones que todos los autenticados pueden hacer
+                [
+                    'allow' => true,
+                    'actions' => ['index', 'view'],
+                    'roles' => ['@'],
                 ],
-            ]
-        );
-    }
+                // Acciones restringidas solo para admin
+                [
+                    'allow' => true,
+                    'actions' => ['create', 'update', 'delete'],
+                    'roles' => ['@'],
+                    'matchCallback' => function ($rule, $action) {
+                        return !Yii::$app->user->isGuest && Yii::$app->user->identity->isAdmin();
+                    }
+                ],
+            ],
+        ],
+    ];
+}
 
     /**
      * Lists all Registros models.
