@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\UsuariosSearch $model */
+/** @var app\models\TarifasSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="usuarios-search">
+<div class="tarifas-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -18,27 +18,27 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'usuario_id') ?>
+    <?= $form->field($model, 'tarifa_id') ?>
 
-    <?= $form->field($model, 'codigo_universitario') ?>
+    <?= $form->field($model, 'tipo_usuario') ?>
 
-    <?= $form->field($model, 'nombre') ?>
+    <?= $form->field($model, 'tipo_vehiculo') ?>
 
-    <?= $form->field($model, 'apellido') ?>
+    <?= $form->field($model, 'tarifa_hora') ?>
 
-    <?= $form->field($model, 'tipo') ?>
+    <?= $form->field($model, 'tarifa_dia') ?>
 
-    <?php // echo $form->field($model, 'email') ?>
+    <?php // echo $form->field($model, 'tarifa_mes') ?>
 
-    <?php // echo $form->field($model, 'telefono') ?>
+    <?php // echo $form->field($model, 'vigente_desde') ?>
 
-    <?php // echo $form->field($model, 'activo') ?>
+    <?php // echo $form->field($model, 'vigente_hasta') ?>
+
+    <?php // echo $form->field($model, 'usuario_registra') ?>
 
     <?php // echo $form->field($model, 'fecha_registro') ?>
 
     <?php // echo $form->field($model, 'fecha_actualizacion') ?>
-
-    <?php // echo $form->field($model, 'foto_perfil_path') ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

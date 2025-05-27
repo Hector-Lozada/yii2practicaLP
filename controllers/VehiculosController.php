@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\models\Usuarios;
-use app\models\UsuariosSearch;
+use app\models\Vehiculos;
+use app\models\VehiculosSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -11,9 +11,9 @@ use yii\web\UploadedFile;
 use Yii;
 
 /**
- * UsuariosController implements the CRUD actions for Usuarios model.
+ * VehiculosController implements the CRUD actions for Vehiculos model.
  */
-class UsuariosController extends Controller
+class VehiculosController extends Controller
 {
     /**
      * @inheritDoc
@@ -34,13 +34,13 @@ class UsuariosController extends Controller
     }
 
     /**
-     * Lists all Usuarios models.
+     * Lists all Vehiculos models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new UsuariosSearch();
+        $searchModel = new VehiculosSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -50,26 +50,26 @@ class UsuariosController extends Controller
     }
 
     /**
-     * Displays a single Usuarios model.
-     * @param int $usuario_id Usuario ID
+     * Displays a single Vehiculos model.
+     * @param int $vehiculo_id Vehiculo ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($usuario_id)
+    public function actionView($vehiculo_id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($usuario_id),
+            'model' => $this->findModel($vehiculo_id),
         ]);
     }
 
     /**
-     * Creates a new Usuarios model.
+     * Creates a new Vehiculos model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
 {
-    $model = new Usuarios();
+    $model = new Vehiculos();
 
     if ($this->request->isPost) {
         $model->load($this->request->post());
@@ -82,10 +82,10 @@ class UsuariosController extends Controller
         }
 
         if ($fileValid && $model->upload() && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Usuario creado correctamente.');
-            return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
+            Yii::$app->session->setFlash('success', 'Vehiculo registrado correctamente.');
+            return $this->redirect(['view', 'vehiculo_id' => $model->usuario_id]);
         } else {
-            Yii::$app->session->setFlash('error', 'Error al crear el usuario.');
+            Yii::$app->session->setFlash('error', 'Error al registrar el vehiculo.');
         }
     } else {
         $model->loadDefaultValues();
@@ -97,16 +97,16 @@ class UsuariosController extends Controller
 }
 
     /**
-     * Updates an existing Usuarios model.
+     * Updates an existing Vehiculos model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $usuario_id Usuario ID
+     * @param int $vehiculo_id Vehiculo ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($usuario_id)
+    public function actionUpdate($vehiculo_id)
     {
-        $model = $this->findModel($usuario_id);
-        $imagenAnterior = $model->foto_perfil_path; // Guardar la ruta de la imagen anterior
+        $model = $this->findModel($vehiculo_id);
+        $imagenAnterior = $model->foto_vehiculo_path; // Guardar la ruta de la imagen anterior
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             // Manejar la subida de la imagen
@@ -119,19 +119,19 @@ class UsuariosController extends Controller
                     if ($imagenAnterior && file_exists($model->getUploadPath() . $imagenAnterior)) {
                         unlink($model->getUploadPath() . $imagenAnterior);
                     }
-                    Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
-                    return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
+                    Yii::$app->session->setFlash('success', 'Vehiculo actualizado correctamente.');
+                    return $this->redirect(['view', 'vehiculo_id' => $model->usuario_id]);
                 }
             } else {
                 // Si no se subió nueva imagen, mantener la anterior
-                $model->foto_perfil_path = $imagenAnterior;
+                $model->foto_vehiculo_path = $imagenAnterior;
                 if ($model->save()) {
-                    Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
-                    return $this->redirect(['view', 'usuario_id' => $model->usuario_id]);
+                    Yii::$app->session->setFlash('success', 'Vehiculo actualizado correctamente.');
+                    return $this->redirect(['view', 'vehiculo_id' => $model->usuario_id]);
                 }
             }
             
-            Yii::$app->session->setFlash('error', 'Error al actualizar el usuario.');
+            Yii::$app->session->setFlash('error', 'Error al actualizar el vehiculo.');
         }
 
         return $this->render('update', [
@@ -139,41 +139,42 @@ class UsuariosController extends Controller
         ]);
     }
 
+
     /**
-     * Deletes an existing Usuarios model.
+     * Deletes an existing Vehiculos model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $usuario_id Usuario ID
+     * @param int $vehiculo_id Vehiculo ID
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($usuario_id)
+    public function actionDelete($vehiculo_id)
     {
-        $model = $this->findModel($usuario_id);
+        $model = $this->findModel($vehiculo_id);
         
         // Eliminar la imagen asociada si existe
-        if ($model->foto_perfil_path && file_exists($model->getUploadPath() . $model->foto_perfil_path)) {
-            unlink($model->getUploadPath() . $model->foto_perfil_path);
+        if ($model->foto_vehiculo_path && file_exists($model->getUploadPath() . $model->foto_vehiculo_path)) {
+            unlink($model->getUploadPath() . $model->foto_vehiculo_path);
         }
         
         if ($model->delete()) {
-            Yii::$app->session->setFlash('success', 'Usuario eliminado correctamente.');
+            Yii::$app->session->setFlash('success', 'Vehiculo eliminado correctamente.');
         } else {
-            Yii::$app->session->setFlash('error', 'Error al eliminar el usuario.');
+            Yii::$app->session->setFlash('error', 'Error al eliminar el Vehiculo.');
         }
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Usuarios model based on its primary key value.
+     * Finds the Vehiculos model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $usuario_id Usuario ID
-     * @return Usuarios the loaded model
+     * @param int $vehiculo_id Vehiculo ID
+     * @return Vehiculos the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($usuario_id)
+    protected function findModel($vehiculo_id)
     {
-        if (($model = Usuarios::findOne(['usuario_id' => $usuario_id])) !== null) {
+        if (($model = Vehiculos::findOne(['vehiculo_id' => $vehiculo_id])) !== null) {
             return $model;
         }
 

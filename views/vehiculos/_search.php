@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\UsuariosSearch $model */
+/** @var app\models\VehiculosSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="usuarios-search">
+<div class="vehiculos-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -18,27 +18,27 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
+    <?= $form->field($model, 'vehiculo_id') ?>
+
     <?= $form->field($model, 'usuario_id') ?>
 
-    <?= $form->field($model, 'codigo_universitario') ?>
+    <?= $form->field($model, 'placa') ?>
 
-    <?= $form->field($model, 'nombre') ?>
+    <?= $form->field($model, 'marca') ?>
 
-    <?= $form->field($model, 'apellido') ?>
+    <?= $form->field($model, 'modelo') ?>
 
-    <?= $form->field($model, 'tipo') ?>
+    <?php // echo $form->field($model, 'color') ?>
 
-    <?php // echo $form->field($model, 'email') ?>
+    <?php // echo $form->field($model, 'foto_vehiculo_path') ?>
 
-    <?php // echo $form->field($model, 'telefono') ?>
+    <?php // echo $form->field($model, 'tipo') ?>
 
-    <?php // echo $form->field($model, 'activo') ?>
+    <?php // echo $form->field($model, 'autorizado') ?>
 
     <?php // echo $form->field($model, 'fecha_registro') ?>
 
     <?php // echo $form->field($model, 'fecha_actualizacion') ?>
-
-    <?php // echo $form->field($model, 'foto_perfil_path') ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

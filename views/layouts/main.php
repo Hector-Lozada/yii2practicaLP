@@ -36,17 +36,27 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
+    
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav me-auto'],
+        'items' => [
+            ['label' => 'Home', 'url' => ['/site/index']],
+            [
+                'label' => 'Estacionamiento Universitario',
+                'items' => [
+                    ['label' => 'Usuarios', 'url' => ['/usuarios/index']],
+                    ['label' => 'Vehículos', 'url' => ['/vehiculos/index']],
+                    ['label' => 'Espacios', 'url' => ['/espacios/index']],
+                    ['label' => 'Registros', 'url' => ['/registros/index']],
+                    ['label' => 'Tarifas', 'url' => ['/tarifas/index']],
+                ],
+            ],
+        ]
+    ]);
+    
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            ['label' => 'Cursos', 'url' => ['/cursos/index']],
-            ['label' => 'Usuarios', 'url' => ['/usuarios/index']],
-            ['label' => 'Examenes', 'url' => ['/examenes/index']],
-            ['label' => 'Lecciones', 'url' => ['/lecciones/index']],
-            ['label' => 'Resultados', 'url' => ['/resultados/index']],
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'
@@ -59,6 +69,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     . '</li>'
         ]
     ]);
+    
     NavBar::end();
     ?>
 </header>

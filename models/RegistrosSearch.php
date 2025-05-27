@@ -4,12 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Usuarios;
+use app\models\Registros;
 
 /**
- * UsuariosSearch represents the model behind the search form of `app\models\Usuarios`.
+ * RegistrosSearch represents the model behind the search form of `app\models\Registros`.
  */
-class UsuariosSearch extends Usuarios
+class RegistrosSearch extends Registros
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,9 @@ class UsuariosSearch extends Usuarios
     public function rules()
     {
         return [
-            [['usuario_id', 'activo'], 'integer'],
-            [['codigo_universitario', 'nombre', 'apellido', 'tipo', 'email', 'telefono', 'fecha_registro', 'fecha_actualizacion', 'foto_perfil_path'], 'safe'],
+            [['registro_id', 'vehiculo_id', 'espacio_id', 'usuario_registra'], 'integer'],
+            [['fecha_entrada', 'fecha_salida', 'metodo_pago', 'observaciones', 'foto_comprobante_path', 'fecha_actualizacion'], 'safe'],
+            [['monto_pagado'], 'number'],
         ];
     }
 
@@ -41,7 +42,7 @@ class UsuariosSearch extends Usuarios
      */
     public function search($params, $formName = null)
     {
-        $query = Usuarios::find();
+        $query = Registros::find();
 
         // add conditions that should always apply here
 
@@ -59,19 +60,19 @@ class UsuariosSearch extends Usuarios
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'usuario_id' => $this->usuario_id,
-            'activo' => $this->activo,
-            'fecha_registro' => $this->fecha_registro,
+            'registro_id' => $this->registro_id,
+            'vehiculo_id' => $this->vehiculo_id,
+            'espacio_id' => $this->espacio_id,
+            'fecha_entrada' => $this->fecha_entrada,
+            'fecha_salida' => $this->fecha_salida,
+            'monto_pagado' => $this->monto_pagado,
+            'usuario_registra' => $this->usuario_registra,
             'fecha_actualizacion' => $this->fecha_actualizacion,
         ]);
 
-        $query->andFilterWhere(['like', 'codigo_universitario', $this->codigo_universitario])
-            ->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'apellido', $this->apellido])
-            ->andFilterWhere(['like', 'tipo', $this->tipo])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'telefono', $this->telefono])
-            ->andFilterWhere(['like', 'foto_perfil_path', $this->foto_perfil_path]);
+        $query->andFilterWhere(['like', 'metodo_pago', $this->metodo_pago])
+            ->andFilterWhere(['like', 'observaciones', $this->observaciones])
+            ->andFilterWhere(['like', 'foto_comprobante_path', $this->foto_comprobante_path]);
 
         return $dataProvider;
     }

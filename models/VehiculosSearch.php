@@ -4,12 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Usuarios;
+use app\models\Vehiculos;
 
 /**
- * UsuariosSearch represents the model behind the search form of `app\models\Usuarios`.
+ * VehiculosSearch represents the model behind the search form of `app\models\Vehiculos`.
  */
-class UsuariosSearch extends Usuarios
+class VehiculosSearch extends Vehiculos
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class UsuariosSearch extends Usuarios
     public function rules()
     {
         return [
-            [['usuario_id', 'activo'], 'integer'],
-            [['codigo_universitario', 'nombre', 'apellido', 'tipo', 'email', 'telefono', 'fecha_registro', 'fecha_actualizacion', 'foto_perfil_path'], 'safe'],
+            [['vehiculo_id', 'usuario_id', 'autorizado'], 'integer'],
+            [['placa', 'marca', 'modelo', 'color', 'foto_vehiculo_path', 'tipo', 'fecha_registro', 'fecha_actualizacion'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class UsuariosSearch extends Usuarios
      */
     public function search($params, $formName = null)
     {
-        $query = Usuarios::find();
+        $query = Vehiculos::find();
 
         // add conditions that should always apply here
 
@@ -59,19 +59,19 @@ class UsuariosSearch extends Usuarios
 
         // grid filtering conditions
         $query->andFilterWhere([
+            'vehiculo_id' => $this->vehiculo_id,
             'usuario_id' => $this->usuario_id,
-            'activo' => $this->activo,
+            'autorizado' => $this->autorizado,
             'fecha_registro' => $this->fecha_registro,
             'fecha_actualizacion' => $this->fecha_actualizacion,
         ]);
 
-        $query->andFilterWhere(['like', 'codigo_universitario', $this->codigo_universitario])
-            ->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'apellido', $this->apellido])
-            ->andFilterWhere(['like', 'tipo', $this->tipo])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'telefono', $this->telefono])
-            ->andFilterWhere(['like', 'foto_perfil_path', $this->foto_perfil_path]);
+        $query->andFilterWhere(['like', 'placa', $this->placa])
+            ->andFilterWhere(['like', 'marca', $this->marca])
+            ->andFilterWhere(['like', 'modelo', $this->modelo])
+            ->andFilterWhere(['like', 'color', $this->color])
+            ->andFilterWhere(['like', 'foto_vehiculo_path', $this->foto_vehiculo_path])
+            ->andFilterWhere(['like', 'tipo', $this->tipo]);
 
         return $dataProvider;
     }
